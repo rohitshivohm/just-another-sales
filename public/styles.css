@@ -1,0 +1,70 @@
+:root {
+  --bg: #f6f8fc;
+  --card: #fff;
+  --primary: #265dff;
+  --secondary: #eef2ff;
+  --border: #e7eaf4;
+  --text: #13233a;
+}
+
+* { box-sizing: border-box; }
+body {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app { max-width: 1240px; margin: 24px auto; padding: 0 16px 48px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 6px 24px rgba(20,33,61,.06);
+  margin-bottom: 16px;
+}
+.center-card { max-width: 420px; margin: 90px auto; }
+.hidden { display: none; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin-bottom: 16px; }
+.metric { padding: 14px; border-radius: 10px; background: #0f183f; color: #fff; }
+.metric .num { font-size: 24px; font-weight: 700; }
+
+.layout-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+.inline-form { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.grid-form { display: grid; gap: 10px; }
+label { display: grid; gap: 4px; font-size: 14px; }
+
+input, select, textarea, button {
+  border: 1px solid #d7def1;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 14px;
+}
+button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+button.secondary { background: var(--secondary); color: #1a2f80; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.muted { color: #6f7c93; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; vertical-align: top; }
+.status-pill {
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12px;
+  display: inline-block;
+  background: #edf2ff;
+}
+
+dialog { width: min(760px, 90vw); border-radius: 12px; border: 1px solid var(--border); }
+pre { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: #f4f6fb; padding: 10px; border-radius: 8px; max-height: 450px; overflow: auto; }
+
+@media (max-width: 1024px) { .layout-grid { grid-template-columns: 1fr; } }
