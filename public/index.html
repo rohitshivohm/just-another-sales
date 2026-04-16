@@ -1,0 +1,118 @@
+<div id="app">
+  <section id="loginView" class="card center-card">
+    <h1>AI Sales Calling Assistant</h1>
+    <p class="muted">Admin Login</p>
+    <form id="loginForm" class="grid-form">
+      <input name="username" placeholder="Username" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <small class="muted">Default: admin / admin123</small>
+  </section>
+
+  <section id="dashboardView" class="hidden">
+    <header class="topbar">
+      <h1>AI Sales Calling Assistant Dashboard</h1>
+      <button id="logoutBtn" class="secondary">Logout</button>
+    </header>
+
+    <div id="metrics" class="metrics-grid"></div>
+
+    <div class="layout-grid">
+      <section class="card">
+        <h2>Leads Management</h2>
+        <form id="addLeadForm" class="inline-form">
+          <input name="name" placeholder="Name" required />
+          <input name="phone" placeholder="Phone" required />
+          <input name="city" placeholder="City" required />
+          <button type="submit">Add Lead</button>
+        </form>
+        <form id="csvForm" class="inline-form">
+          <input type="file" id="csvFile" accept=".csv" required />
+          <button type="submit" class="secondary">Upload CSV</button>
+        </form>
+        <div class="inline-form">
+          <input id="searchInput" placeholder="Search leads" />
+          <select id="statusFilter">
+            <option value="">All Status</option>
+            <option>New</option>
+            <option>Called</option>
+            <option>Hot</option>
+            <option>Warm</option>
+            <option>Cold</option>
+          </select>
+          <input id="cityFilter" placeholder="Filter city" />
+          <button id="applyFilter" type="button" class="secondary">Apply</button>
+        </div>
+        <div class="toolbar">
+          <button id="startBulkBtn">Start AI Calling</button>
+          <span id="queueInfo" class="muted"></span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll" /></th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leadTableBody"></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>AI Configuration Panel</h2>
+        <form id="configForm" class="grid-form">
+          <label>Language Style
+            <select name="languageStyle">
+              <option>English</option>
+              <option>Hinglish</option>
+            </select>
+          </label>
+          <label>Tone
+            <select name="tone">
+              <option>formal</option>
+              <option>friendly</option>
+            </select>
+          </label>
+          <label>Opening Script
+            <textarea name="openingScript" rows="2"></textarea>
+          </label>
+          <label>Question Flow (one per line)
+            <textarea name="questionFlow" rows="4"></textarea>
+          </label>
+          <label>Closing Statement
+            <textarea name="closingStatement" rows="2"></textarea>
+          </label>
+          <button type="submit">Save Configuration</button>
+        </form>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Call Logs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Status</th>
+            <th>Duration (s)</th>
+            <th>Attempts</th>
+            <th>Summary</th>
+            <th>Transcript</th>
+          </tr>
+        </thead>
+        <tbody id="callLogsBody"></tbody>
+      </table>
+    </section>
+  </section>
+</div>
+
+<dialog id="transcriptDialog">
+  <h3>Full Conversation</h3>
+  <pre id="transcriptText"></pre>
+  <button id="closeTranscript" class="secondary">Close</button>
+</dialog>
