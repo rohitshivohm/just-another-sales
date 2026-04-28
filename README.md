@@ -89,3 +89,11 @@ Optional env vars:
 - `PUT config`
 
 All routes except login require `Authorization: Bearer <token>`.
+
+## WordPress plugin scaffold
+
+A WordPress QR plugin foundation is included at:
+
+- `wordpress-plugin/just-another-qr/`
+
+It includes shortcode, block, widget, campaign/code post types, and a basic dynamic tracking endpoint.

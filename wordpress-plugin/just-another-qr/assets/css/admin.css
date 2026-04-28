@@ -1,0 +1,132 @@
+:root {
+  --jaqr-bg: #f5f7fb;
+  --jaqr-card: #ffffff;
+  --jaqr-border: #d9e0ea;
+  --jaqr-text: #1f2937;
+  --jaqr-muted: #64748b;
+  --jaqr-accent: #2563eb;
+}
+
+.jaqr-admin-wrap {
+  background: linear-gradient(180deg, #f7f9ff 0%, #f5f7fb 100%);
+  border: 1px solid var(--jaqr-border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.jaqr-builder-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(320px, 1fr);
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.jaqr-card {
+  background: var(--jaqr-card);
+  border: 1px solid var(--jaqr-border);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.jaqr-card:nth-child(2) {
+  position: sticky;
+  top: 32px;
+  align-self: start;
+}
+
+.jaqr-admin-wrap h1,
+.jaqr-admin-wrap h2,
+.jaqr-admin-wrap h3,
+.jaqr-card h2,
+.jaqr-card h3 {
+  margin-top: 0;
+  color: var(--jaqr-text);
+}
+
+.jaqr-section-title {
+  display: inline-block;
+  margin: 14px 0 8px;
+  color: var(--jaqr-accent);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.jaqr-builder-grid label {
+  color: var(--jaqr-text);
+}
+
+.jaqr-builder-grid .widefat,
+.jaqr-builder-grid input[type="number"],
+.jaqr-builder-grid input[type="text"],
+.jaqr-builder-grid input[type="url"],
+.jaqr-builder-grid select {
+  margin-top: 4px;
+  border: 1px solid var(--jaqr-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.jaqr-builder-grid input[type="color"] {
+  width: 48px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.jaqr-builder-grid p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.jaqr-admin-wrap .jaqr-shortcode-output {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  border-radius: 8px;
+  border: 1px solid var(--jaqr-border);
+}
+
+.jaqr-trend {
+  max-width: 860px;
+  display: grid;
+  gap: 10px;
+}
+
+.jaqr-trend-item {
+  display: grid;
+  grid-template-columns: 72px 1fr 50px;
+  align-items: center;
+  gap: 8px;
+}
+
+.jaqr-trend-label,
+.jaqr-trend-value {
+  font-size: 12px;
+  color: var(--jaqr-muted);
+}
+
+.jaqr-trend-bar {
+  display: block;
+  height: 10px;
+  background: #eceff3;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.jaqr-trend-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #2271b1, #72aee6);
+}
+
+@media (max-width: 980px) {
+  .jaqr-builder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jaqr-card:nth-child(2) {
+    position: static;
+  }
+}
