@@ -72,6 +72,18 @@ class Code_Manager
                     <input class="widefat" id="jaqr_frame" name="jaqr_frame" type="text" value="<?php echo esc_attr($meta['frame']); ?>">
                 </p>
                 <p>
+                    <label for="jaqr_fg"><strong><?php esc_html_e('Foreground Color', 'just-another-qr'); ?></strong></label><br>
+                    <input id="jaqr_fg" name="jaqr_fg" type="color" value="<?php echo esc_attr($meta['fg']); ?>">
+                </p>
+                <p>
+                    <label for="jaqr_bg"><strong><?php esc_html_e('Background Color', 'just-another-qr'); ?></strong></label><br>
+                    <input id="jaqr_bg" name="jaqr_bg" type="color" value="<?php echo esc_attr($meta['bg']); ?>">
+                </p>
+                <p>
+                    <label for="jaqr_margin"><strong><?php esc_html_e('Margin', 'just-another-qr'); ?></strong></label><br>
+                    <input id="jaqr_margin" name="jaqr_margin" type="number" min="0" max="20" value="<?php echo esc_attr((string) $meta['margin']); ?>">
+                </p>
+                <p>
                     <label><input type="checkbox" name="jaqr_show_center_text" value="1" <?php checked($meta['show_center_text'], 1); ?>> <?php esc_html_e('Show brand text in QR center', 'just-another-qr'); ?></label>
                 </p>
                 <p>
@@ -88,8 +100,12 @@ class Code_Manager
                     'size' => $meta['size'],
                     'alt' => $meta['alt'],
                     'frame' => $meta['frame'],
+                    'fg' => $meta['fg'],
+                    'bg' => $meta['bg'],
+                    'margin' => $meta['margin'],
                     'show_center_text' => $meta['show_center_text'],
                     'center_text' => $meta['center_text'],
+                    'show_downloads' => true,
                 ]); ?>
             </div>
         </div>
@@ -117,6 +133,9 @@ class Code_Manager
         $size = max(100, min(1024, (int) ($_POST['jaqr_size'] ?? self::default_size())));
         $alt = sanitize_text_field((string) ($_POST['jaqr_alt'] ?? __('QR code', 'just-another-qr')));
         $frame = sanitize_text_field((string) ($_POST['jaqr_frame'] ?? ''));
+        $fg = sanitize_hex_color((string) ($_POST['jaqr_fg'] ?? '#000000')) ?: '#000000';
+        $bg = sanitize_hex_color((string) ($_POST['jaqr_bg'] ?? '#ffffff')) ?: '#ffffff';
+        $margin = max(0, min(20, (int) ($_POST['jaqr_margin'] ?? 1)));
         $show_center_text = empty($_POST['jaqr_show_center_text']) ? 0 : 1;
         $center_text = sanitize_text_field((string) ($_POST['jaqr_center_text'] ?? ''));
 
@@ -127,6 +146,9 @@ class Code_Manager
         update_post_meta($post_id, '_jaqr_size', $size);
         update_post_meta($post_id, '_jaqr_alt', $alt);
         update_post_meta($post_id, '_jaqr_frame', $frame);
+        update_post_meta($post_id, '_jaqr_fg', $fg);
+        update_post_meta($post_id, '_jaqr_bg', $bg);
+        update_post_meta($post_id, '_jaqr_margin', $margin);
         update_post_meta($post_id, '_jaqr_show_center_text', $show_center_text);
         update_post_meta($post_id, '_jaqr_center_text', $center_text);
     }
@@ -150,8 +172,12 @@ class Code_Manager
             'size' => $meta['size'],
             'alt' => $meta['alt'],
             'frame' => $meta['frame'],
+            'fg' => $meta['fg'],
+            'bg' => $meta['bg'],
+            'margin' => $meta['margin'],
             'show_center_text' => $meta['show_center_text'],
             'center_text' => $meta['center_text'],
+            'show_downloads' => true,
         ]);
     }
 
@@ -191,6 +217,9 @@ class Code_Manager
             'size' => (int) get_post_meta($post_id, '_jaqr_size', true) ?: self::default_size(),
             'alt' => (string) get_post_meta($post_id, '_jaqr_alt', true) ?: __('QR code', 'just-another-qr'),
             'frame' => (string) get_post_meta($post_id, '_jaqr_frame', true),
+            'fg' => (string) get_post_meta($post_id, '_jaqr_fg', true) ?: '#000000',
+            'bg' => (string) get_post_meta($post_id, '_jaqr_bg', true) ?: '#ffffff',
+            'margin' => (int) get_post_meta($post_id, '_jaqr_margin', true) ?: 1,
             'show_center_text' => (int) get_post_meta($post_id, '_jaqr_show_center_text', true) ?: $default_show_brand,
             'center_text' => (string) get_post_meta($post_id, '_jaqr_center_text', true) ?: $default_brand,
             'total_scans' => (int) get_post_meta($post_id, '_jaqr_total_scans', true),

@@ -24,6 +24,7 @@ class Renderer
             'class' => '',
             'show_center_text' => false,
             'center_text' => '',
+            'show_downloads' => false,
         ];
 
         $args = wp_parse_args($atts, $defaults);
@@ -33,6 +34,8 @@ class Renderer
         $wrapper_class = 'jaqr-wrap ' . sanitize_html_class((string) $args['class']);
         $center_text = trim((string) $args['center_text']);
         $show_center_text = ! empty($args['show_center_text']) && $center_text !== '';
+        $download_png = Qr_Generator::build_download_url($args, 'png');
+        $download_svg = Qr_Generator::build_download_url($args, 'svg');
 
         ob_start();
         ?>
@@ -53,6 +56,12 @@ class Renderer
                     <span class="jaqr-center-badge"><?php echo esc_html($center_text); ?></span>
                 <?php endif; ?>
             </div>
+            <?php if (! empty($args['show_downloads'])) : ?>
+                <div class="jaqr-actions">
+                    <a class="jaqr-btn" href="<?php echo esc_url($download_png); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Download PNG', 'just-another-qr'); ?></a>
+                    <a class="jaqr-btn" href="<?php echo esc_url($download_svg); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Download SVG', 'just-another-qr'); ?></a>
+                </div>
+            <?php endif; ?>
         </figure>
         <?php
 

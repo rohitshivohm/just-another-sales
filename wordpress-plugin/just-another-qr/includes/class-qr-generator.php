@@ -14,9 +14,10 @@ class Qr_Generator
      */
     public static function build_image_url(array $args): string
     {
-        $payload = rawurlencode((string) ($args['content'] ?? home_url('/')));
+        $payload = (string) ($args['content'] ?? home_url('/'));
         $size = max(100, min((int) ($args['size'] ?? 220), 2048));
         $margin = max(0, min((int) ($args['margin'] ?? 1), 20));
+        $format = in_array(($args['format'] ?? 'png'), ['png', 'svg', 'eps'], true) ? (string) $args['format'] : 'png';
 
         $color = self::sanitize_hex($args['fg'] ?? '#000000', '000000');
         $bg = self::sanitize_hex($args['bg'] ?? '#ffffff', 'ffffff');
@@ -29,13 +30,13 @@ class Qr_Generator
             'data' => $payload,
             'color' => $color,
             'bgcolor' => $bg,
-            'format' => 'png',
+            'format' => $format,
         ], $base);
     }
 
-    public static function build_svg_data_uri(array $args): string
+    public static function build_download_url(array $args, string $format = 'png'): string
     {
-        $url = self::build_image_url(array_merge($args, ['format' => 'svg']));
+        $url = self::build_image_url(array_merge($args, ['format' => $format]));
 
         return esc_url_raw($url);
     }

@@ -46,3 +46,19 @@
   font-size: 12px;
   letter-spacing: 0.02em;
 }
+
+.jaqr-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.jaqr-btn {
+  text-decoration: none;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #111;
+  background: #fff;
+}

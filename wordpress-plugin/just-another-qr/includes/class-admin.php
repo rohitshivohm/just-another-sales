@@ -98,6 +98,16 @@ class Admin
             <?php else : ?>
                 <p><?php esc_html_e('No QR codes yet. Create one to get started.', 'just-another-qr'); ?></p>
             <?php endif; ?>
+            <h2><?php esc_html_e('Last 7 Days Scan Trend', 'just-another-qr'); ?></h2>
+            <div class="jaqr-trend">
+                <?php foreach (self::get_scan_trend(7) as $point) : ?>
+                    <div class="jaqr-trend-item">
+                        <span class="jaqr-trend-label"><?php echo esc_html($point['label']); ?></span>
+                        <span class="jaqr-trend-bar"><span style="width: <?php echo esc_attr((string) $point['percent']); ?>%"></span></span>
+                        <span class="jaqr-trend-value"><?php echo esc_html((string) $point['value']); ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
         <?php
     }
@@ -150,16 +160,22 @@ class Admin
         $show_center_text = isset($_GET['show_center_text'])
             ? (int) (((string) $_GET['show_center_text']) === '1')
             : (int) ($settings['show_brand_center'] ?? 0);
+        $fg = sanitize_hex_color((string) ($_GET['fg'] ?? '#000000')) ?: '#000000';
+        $bg = sanitize_hex_color((string) ($_GET['bg'] ?? '#ffffff')) ?: '#ffffff';
+        $margin = max(0, min(20, (int) ($_GET['margin'] ?? 1)));
 
         $shortcode = sprintf(
-            '[jaqr type="%s" content="%s" size="%d" frame="%s" alt="%s" show_center_text="%d" center_text="%s"]',
+            '[jaqr type="%s" content="%s" size="%d" frame="%s" alt="%s" show_center_text="%d" center_text="%s" fg="%s" bg="%s" margin="%d"]',
             esc_attr($type),
             esc_attr($content),
             $size,
             esc_attr($frame),
             esc_attr($alt),
             $show_center_text,
-            esc_attr($center_text)
+            esc_attr($center_text),
+            esc_attr($fg),
+            esc_attr($bg),
+            $margin
         );
         ?>
         <div class="wrap jaqr-admin-wrap">
@@ -204,6 +220,18 @@ class Admin
                             <input class="widefat" id="jaqr_builder_center_text" name="center_text" type="text" value="<?php echo esc_attr($center_text); ?>" />
                         </p>
                         <p>
+                            <label for="jaqr_builder_fg"><strong><?php esc_html_e('Foreground', 'just-another-qr'); ?></strong></label><br>
+                            <input id="jaqr_builder_fg" name="fg" type="color" value="<?php echo esc_attr($fg); ?>" />
+                        </p>
+                        <p>
+                            <label for="jaqr_builder_bg"><strong><?php esc_html_e('Background', 'just-another-qr'); ?></strong></label><br>
+                            <input id="jaqr_builder_bg" name="bg" type="color" value="<?php echo esc_attr($bg); ?>" />
+                        </p>
+                        <p>
+                            <label for="jaqr_builder_margin"><strong><?php esc_html_e('Margin', 'just-another-qr'); ?></strong></label><br>
+                            <input id="jaqr_builder_margin" name="margin" type="number" min="0" max="20" value="<?php echo esc_attr((string) $margin); ?>" />
+                        </p>
+                        <p>
                             <button class="button button-primary" type="submit"><?php esc_html_e('Generate Preview', 'just-another-qr'); ?></button>
                         </p>
                     </form>
@@ -211,7 +239,29 @@ class Admin
 
                 <div class="jaqr-card">
                     <h2><?php esc_html_e('Live Preview', 'just-another-qr'); ?></h2>
-                    <?php echo do_shortcode($shortcode); ?>
+                    <?php echo Renderer::render_qr([
+                        'content' => Shortcode::build_payload([
+                            'type' => $type,
+                            'content' => $content,
+                            'phone' => $content,
+                            'email' => $content,
+                            'subject' => '',
+                            'body' => '',
+                            'message' => '',
+                            'ssid' => '',
+                            'password' => '',
+                            'encryption' => 'WPA',
+                        ]),
+                        'size' => $size,
+                        'alt' => $alt,
+                        'frame' => $frame,
+                        'show_center_text' => $show_center_text,
+                        'center_text' => $center_text,
+                        'fg' => $fg,
+                        'bg' => $bg,
+                        'margin' => $margin,
+                        'show_downloads' => true,
+                    ]); ?>
 
                     <h3><?php esc_html_e('Shortcode', 'just-another-qr'); ?></h3>
                     <textarea class="widefat jaqr-shortcode-output" rows="3" readonly><?php echo esc_textarea($shortcode); ?></textarea>
@@ -235,5 +285,35 @@ class Admin
             'brand_name' => '',
             'show_brand_center' => 0,
         ];
+    }
+
+    private static function get_scan_trend(int $days = 7): array
+    {
+        $days = max(1, min(31, $days));
+        $codes = get_posts([
+            'post_type' => 'jaqr_code',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+            'fields' => 'ids',
+        ]);
+
+        $series = [];
+        $max = 0;
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $day = gmdate('Ymd', strtotime("-{$i} days"));
+            $label = gmdate('M d', strtotime("-{$i} days"));
+            $value = 0;
+            foreach ($codes as $id) {
+                $value += (int) get_post_meta((int) $id, '_jaqr_scans_' . $day, true);
+            }
+            $max = max($max, $value);
+            $series[] = ['label' => $label, 'value' => $value];
+        }
+
+        foreach ($series as &$point) {
+            $point['percent'] = $max > 0 ? max(4, (int) round(($point['value'] / $max) * 100)) : 4;
+        }
+
+        return $series;
     }
 }
