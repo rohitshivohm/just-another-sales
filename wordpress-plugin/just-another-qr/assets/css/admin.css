@@ -1,0 +1,24 @@
+.jaqr-admin-wrap .jaqr-builder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.jaqr-admin-wrap .jaqr-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.jaqr-admin-wrap h1,
+.jaqr-admin-wrap h2,
+.jaqr-admin-wrap h3 {
+  margin-top: 0;
+}
+
+.jaqr-admin-wrap .jaqr-shortcode-output {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}

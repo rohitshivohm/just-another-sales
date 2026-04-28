@@ -66,6 +66,11 @@ final class Plugin
     public function enqueue_admin_assets(): void
     {
         wp_register_script('jaqr-block', JAQR_URL . 'assets/js/block.js', ['wp-blocks', 'wp-element', 'wp-editor'], JAQR_VERSION, true);
+        wp_register_style('jaqr-admin-style', JAQR_URL . 'assets/css/admin.css', [], JAQR_VERSION);
+        wp_register_script('jaqr-admin-script', JAQR_URL . 'assets/js/admin.js', [], JAQR_VERSION, true);
+
+        wp_enqueue_style('jaqr-admin-style');
+        wp_enqueue_script('jaqr-admin-script');
     }
 
     public function register_block(): void

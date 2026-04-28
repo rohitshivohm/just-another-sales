@@ -15,6 +15,7 @@ This plugin scaffold is structured to support the full feature set requested for
   - See live preview + copy shortcode (`[jaqr_code id=\"123\"]`)
 - Dynamic QR redirect endpoint (`/wp-json/jaqr/v1/track/{id}`) with total + daily scan counts.
 - Admin dashboard + settings pages.
+- New QR Builder admin page (`Just Another QR → QR Builder`) for postless, instant QR generation + shortcode copy.
 - Frontend styling (frame label + shadow effect).
 
 ## Settings behavior (now connected)
@@ -38,6 +39,8 @@ This plugin scaffold is structured to support the full feature set requested for
 
 ## Quick usage
 
+- No-post flow:
+  - Go to **Just Another QR → QR Builder**, generate a QR, copy shortcode, paste anywhere.
 - Shortcode URL:
   - `[jaqr type="url" content="https://example.com"]`
 - Shortcode WhatsApp:
