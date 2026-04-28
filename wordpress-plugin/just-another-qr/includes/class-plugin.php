@@ -31,6 +31,7 @@ final class Plugin
         require_once JAQR_DIR . 'includes/class-qr-generator.php';
         require_once JAQR_DIR . 'includes/class-renderer.php';
         require_once JAQR_DIR . 'includes/class-shortcode.php';
+        require_once JAQR_DIR . 'includes/class-code-manager.php';
         require_once JAQR_DIR . 'includes/class-widget.php';
         require_once JAQR_DIR . 'includes/class-rest.php';
         require_once JAQR_DIR . 'includes/class-admin.php';
@@ -42,6 +43,7 @@ final class Plugin
 
         add_action('init', [Post_Types::class, 'register']);
         add_action('init', [Shortcode::class, 'register']);
+        add_action('init', [Code_Manager::class, 'register']);
         add_action('init', [$this, 'register_block']);
         add_action('widgets_init', [JAQR_Widget::class, 'register']);
 

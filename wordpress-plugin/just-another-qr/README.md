@@ -2,15 +2,28 @@
 
 This plugin scaffold is structured to support the full feature set requested for an advanced QR product.
 
-## Implemented in this scaffold
+## Implemented and working now
 
 - Static QR rendering via shortcode (`[jaqr]`) and widget.
 - Content types in shortcode: URL, text, phone, email, SMS, WhatsApp, WiFi, vCard.
 - Gutenberg block registration (`jaqr/qr-code`) with server-side rendering.
 - QR library and campaign custom post types.
-- Basic dynamic QR redirect endpoint (`/wp-json/jaqr/v1/track/{id}`) with total + daily scan counts.
+- QR code editor UI in each `QR Code` post:
+  - Configure content type + value
+  - Toggle dynamic redirect
+  - Set destination URL, size, alt text, frame
+  - See live preview + copy shortcode (`[jaqr_code id=\"123\"]`)
+- Dynamic QR redirect endpoint (`/wp-json/jaqr/v1/track/{id}`) with total + daily scan counts.
 - Admin dashboard + settings pages.
 - Frontend styling (frame label + shadow effect).
+
+## Settings behavior (now connected)
+
+- `Enable Dynamic QR`:
+  - ON: codes with **Enable dynamic tracking** checked use tracked redirect URL.
+  - OFF: tracked redirects are blocked, and QR output uses static payload.
+- `Default QR Size`:
+  - Applies to shortcode/block/render defaults and new QR code records.
 
 ## Next implementation phases for full parity
 

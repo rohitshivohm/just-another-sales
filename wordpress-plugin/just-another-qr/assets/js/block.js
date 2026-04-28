@@ -4,7 +4,7 @@
   const { registerBlockType } = wp.blocks;
   const { createElement: el } = wp.element;
   const { InspectorControls } = wp.blockEditor;
-  const { PanelBody, TextControl, RangeControl, ToggleControl } = wp.components;
+  const { PanelBody, TextControl, RangeControl } = wp.components;
 
   registerBlockType('jaqr/qr-code', {
     title: 'Just Another QR',

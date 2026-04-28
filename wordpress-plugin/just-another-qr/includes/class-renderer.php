@@ -10,9 +10,12 @@ class Renderer
 {
     public static function render_qr(array $atts): string
     {
+        $settings = get_option('jaqr_settings', []);
+        $default_size = max(100, min(1024, (int) ($settings['default_size'] ?? 220)));
+
         $defaults = [
             'content' => home_url('/'),
-            'size' => 220,
+            'size' => $default_size,
             'margin' => 1,
             'fg' => '#000000',
             'bg' => '#ffffff',

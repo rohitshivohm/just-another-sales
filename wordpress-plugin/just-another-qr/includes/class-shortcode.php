@@ -15,10 +15,13 @@ class Shortcode
 
     public static function render_shortcode(array $atts = []): string
     {
+        $settings = get_option('jaqr_settings', []);
+        $default_size = max(100, min(1024, (int) ($settings['default_size'] ?? 220)));
+
         $atts = shortcode_atts([
             'type' => 'url',
             'content' => home_url('/'),
-            'size' => 220,
+            'size' => $default_size,
             'margin' => 1,
             'fg' => '#000000',
             'bg' => '#ffffff',
@@ -39,16 +42,16 @@ class Shortcode
         return Renderer::render_qr($atts);
     }
 
-    private static function build_payload(array $atts): string
+    public static function build_payload(array $atts): string
     {
         $type = strtolower((string) $atts['type']);
 
         return match ($type) {
             'text' => (string) $atts['content'],
-            'phone' => 'tel:' . preg_replace('/\s+/', '', (string) $atts['phone']),
-            'email' => sprintf('mailto:%s?subject=%s&body=%s', rawurlencode((string) $atts['email']), rawurlencode((string) $atts['subject']), rawurlencode((string) $atts['body'])),
-            'sms' => sprintf('smsto:%s:%s', preg_replace('/\s+/', '', (string) $atts['phone']), (string) $atts['message']),
-            'whatsapp' => 'https://wa.me/' . preg_replace('/\D+/', '', (string) $atts['phone']) . '?text=' . rawurlencode((string) $atts['message']),
+            'phone' => 'tel:' . preg_replace('/\s+/', '', (string) ($atts['phone'] ?: $atts['content'])),
+            'email' => sprintf('mailto:%s?subject=%s&body=%s', rawurlencode((string) ($atts['email'] ?: $atts['content'])), rawurlencode((string) $atts['subject']), rawurlencode((string) $atts['body'])),
+            'sms' => sprintf('smsto:%s:%s', preg_replace('/\s+/', '', (string) ($atts['phone'] ?: $atts['content'])), (string) ($atts['message'] ?: $atts['content'])),
+            'whatsapp' => 'https://wa.me/' . preg_replace('/\D+/', '', (string) ($atts['phone'] ?: $atts['content'])) . '?text=' . rawurlencode((string) $atts['message']),
             'wifi' => sprintf('WIFI:T:%s;S:%s;P:%s;;', sanitize_text_field((string) $atts['encryption']), sanitize_text_field((string) $atts['ssid']), sanitize_text_field((string) $atts['password'])),
             'vcard' => self::build_vcard($atts),
             default => esc_url_raw((string) $atts['content']),

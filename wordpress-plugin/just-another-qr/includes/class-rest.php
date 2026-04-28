@@ -46,6 +46,10 @@ class Rest
 
     public static function track_and_redirect(WP_REST_Request $request)
     {
+        if (! Code_Manager::dynamic_enabled_globally()) {
+            return new \WP_Error('jaqr_dynamic_disabled', __('Dynamic QR is disabled in plugin settings.', 'just-another-qr'), ['status' => 403]);
+        }
+
         $id = (int) $request->get_param('id');
 
         $target = get_post_meta($id, '_jaqr_target_url', true);
