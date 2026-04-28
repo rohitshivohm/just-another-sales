@@ -184,9 +184,10 @@ class Admin
 
             <div class="jaqr-builder-grid">
                 <div class="jaqr-card">
-                    <form method="get" action="">
+                    <form method="get" action="" class="jaqr-live-form" data-live="builder">
                         <input type="hidden" name="page" value="jaqr-builder" />
                         <input type="hidden" name="show_center_text" value="0" />
+                        <p class="jaqr-section-title"><?php esc_html_e('Content', 'just-another-qr'); ?></p>
                         <p>
                             <label for="jaqr_builder_type"><strong><?php esc_html_e('Type', 'just-another-qr'); ?></strong></label><br>
                             <select id="jaqr_builder_type" name="type">
@@ -200,13 +201,10 @@ class Admin
                             <label for="jaqr_builder_content"><strong><?php esc_html_e('Content', 'just-another-qr'); ?></strong></label><br>
                             <input class="widefat" id="jaqr_builder_content" name="content" type="text" value="<?php echo esc_attr($content); ?>" />
                         </p>
+                        <p class="jaqr-section-title"><?php esc_html_e('Design', 'just-another-qr'); ?></p>
                         <p>
                             <label for="jaqr_builder_size"><strong><?php esc_html_e('Size', 'just-another-qr'); ?></strong></label><br>
                             <input id="jaqr_builder_size" name="size" type="number" min="100" max="1024" value="<?php echo esc_attr((string) $size); ?>" />
-                        </p>
-                        <p>
-                            <label for="jaqr_builder_frame"><strong><?php esc_html_e('Frame Label', 'just-another-qr'); ?></strong></label><br>
-                            <input class="widefat" id="jaqr_builder_frame" name="frame" type="text" value="<?php echo esc_attr($frame); ?>" />
                         </p>
                         <p>
                             <label for="jaqr_builder_alt"><strong><?php esc_html_e('Alt Text', 'just-another-qr'); ?></strong></label><br>
@@ -231,6 +229,11 @@ class Admin
                             <label for="jaqr_builder_margin"><strong><?php esc_html_e('Margin', 'just-another-qr'); ?></strong></label><br>
                             <input id="jaqr_builder_margin" name="margin" type="number" min="0" max="20" value="<?php echo esc_attr((string) $margin); ?>" />
                         </p>
+                        <p class="jaqr-section-title"><?php esc_html_e('Branding', 'just-another-qr'); ?></p>
+                        <p>
+                            <label for="jaqr_builder_frame"><strong><?php esc_html_e('Frame Label', 'just-another-qr'); ?></strong></label><br>
+                            <input class="widefat" id="jaqr_builder_frame" name="frame" type="text" value="<?php echo esc_attr($frame); ?>" />
+                        </p>
                         <p>
                             <button class="button button-primary" type="submit"><?php esc_html_e('Generate Preview', 'just-another-qr'); ?></button>
                         </p>
@@ -239,6 +242,7 @@ class Admin
 
                 <div class="jaqr-card">
                     <h2><?php esc_html_e('Live Preview', 'just-another-qr'); ?></h2>
+                    <p class="description"><?php esc_html_e('Premium live mode: updates while you type.', 'just-another-qr'); ?></p>
                     <?php echo Renderer::render_qr([
                         'content' => Shortcode::build_payload([
                             'type' => $type,
@@ -264,9 +268,9 @@ class Admin
                     ]); ?>
 
                     <h3><?php esc_html_e('Shortcode', 'just-another-qr'); ?></h3>
-                    <textarea class="widefat jaqr-shortcode-output" rows="3" readonly><?php echo esc_textarea($shortcode); ?></textarea>
+                    <textarea id="jaqr_builder_shortcode" class="widefat jaqr-shortcode-output" rows="3" readonly><?php echo esc_textarea($shortcode); ?></textarea>
                     <p>
-                        <button type="button" class="button jaqr-copy-shortcode" data-copy-target=".jaqr-shortcode-output">
+                        <button type="button" class="button jaqr-copy-shortcode" data-copy-target="#jaqr_builder_shortcode">
                             <?php esc_html_e('Copy Shortcode', 'just-another-qr'); ?>
                         </button>
                     </p>

@@ -38,7 +38,7 @@ class Code_Manager
         $meta = self::get_code_meta($post->ID);
         $preview = self::resolve_qr_content($post->ID, $meta);
         ?>
-        <div class="jaqr-builder-grid">
+        <div class="jaqr-builder-grid jaqr-live-form" data-live="post">
             <div class="jaqr-card">
                 <p>
                     <label for="jaqr_type"><strong><?php esc_html_e('Content Type', 'just-another-qr'); ?></strong></label><br>
@@ -94,6 +94,7 @@ class Code_Manager
             <div class="jaqr-card">
                 <p><strong><?php esc_html_e('Quick Embed', 'just-another-qr'); ?></strong></p>
                 <code>[jaqr_code id="<?php echo esc_html((string) $post->ID); ?>"]</code>
+                <p class="description"><?php esc_html_e('Preview updates live as you change fields.', 'just-another-qr'); ?></p>
                 <p><strong><?php esc_html_e('Live Preview', 'just-another-qr'); ?></strong></p>
                 <?php echo Renderer::render_qr([
                     'content' => $preview,

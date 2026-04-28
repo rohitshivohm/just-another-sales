@@ -16,6 +16,7 @@ This plugin scaffold is structured to support the full feature set requested for
 - Dynamic QR redirect endpoint (`/wp-json/jaqr/v1/track/{id}`) with total + daily scan counts.
 - Admin dashboard + settings pages.
 - New QR Builder admin page (`Just Another QR → QR Builder`) for postless, instant QR generation + shortcode copy.
+- Premium UI pass: live-updating builder/post preview, sticky preview panel, sectioned controls, and refined card visuals.
 - Brand text in QR center (configurable globally and per QR code).
 - Advanced styling controls in builder + QR post editor: foreground/background color and margin.
 - Download actions for PNG/SVG from preview cards.

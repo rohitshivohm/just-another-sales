@@ -45,6 +45,7 @@ class Renderer
             <?php endif; ?>
             <div class="jaqr-canvas">
                 <img
+                    class="jaqr-image"
                     src="<?php echo esc_url($img); ?>"
                     alt="<?php echo esc_attr((string) $args['alt']); ?>"
                     width="<?php echo esc_attr((int) $args['size']); ?>"
