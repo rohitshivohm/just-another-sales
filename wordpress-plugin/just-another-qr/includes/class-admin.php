@@ -22,7 +22,7 @@ class Admin
 
         add_submenu_page('jaqr-dashboard', __('Dashboard', 'just-another-qr'), __('Dashboard', 'just-another-qr'), 'manage_options', 'jaqr-dashboard', [self::class, 'render_dashboard']);
         add_submenu_page('jaqr-dashboard', __('QR Builder', 'just-another-qr'), __('QR Builder', 'just-another-qr'), 'edit_posts', 'jaqr-builder', [self::class, 'render_builder']);
-        add_submenu_page('jaqr-dashboard', __('QR Library', 'just-another-qr'), __('QR Library', 'just-another-qr'), 'edit_posts', 'edit.php?post_type=jaqr_code');
+        add_submenu_page('jaqr-dashboard', __('QR Manager', 'just-another-qr'), __('QR Manager', 'just-another-qr'), 'edit_posts', 'jaqr-manager', [self::class, 'render_manager']);
         add_submenu_page('jaqr-dashboard', __('Campaigns', 'just-another-qr'), __('Campaigns', 'just-another-qr'), 'edit_posts', 'edit.php?post_type=jaqr_campaign');
         add_submenu_page('jaqr-dashboard', __('Settings', 'just-another-qr'), __('Settings', 'just-another-qr'), 'manage_options', 'jaqr-settings', [self::class, 'render_settings']);
     }
@@ -88,7 +88,7 @@ class Admin
                     <tbody>
                     <?php foreach ($latest_codes as $code): ?>
                         <tr>
-                            <td><a href="<?php echo esc_url(get_edit_post_link($code->ID)); ?>"><?php echo esc_html(get_the_title($code->ID)); ?></a></td>
+                            <td><a href="<?php echo esc_url(admin_url('admin.php?page=jaqr-manager&edit=' . $code->ID)); ?>"><?php echo esc_html(get_the_title($code->ID)); ?></a></td>
                             <td><code>[jaqr_code id="<?php echo esc_html((string) $code->ID); ?>"]</code></td>
                             <td><?php echo esc_html((string) ((int) get_post_meta($code->ID, '_jaqr_total_scans', true))); ?></td>
                         </tr>
@@ -280,6 +280,104 @@ class Admin
         <?php
     }
 
+    public static function render_manager(): void
+    {
+        self::handle_manager_save();
+
+        $edit_id = max(0, (int) ($_GET['edit'] ?? 0));
+        $is_edit = $edit_id > 0 && get_post_type($edit_id) === 'jaqr_code';
+        $meta = $is_edit ? Code_Manager::get_code_meta($edit_id) : self::manager_default_meta();
+        $title = $is_edit ? get_the_title($edit_id) : __('New QR Code', 'just-another-qr');
+
+        $shortcode = $is_edit
+            ? '[jaqr_code id="' . $edit_id . '"]'
+            : sprintf('[jaqr type="%s" content="%s"]', esc_attr($meta['type']), esc_attr($meta['content']));
+
+        $preview_content = $is_edit
+            ? Code_Manager::resolve_qr_content($edit_id, $meta)
+            : Shortcode::build_payload([
+                'type' => $meta['type'],
+                'content' => $meta['content'],
+                'phone' => $meta['content'],
+                'email' => $meta['content'],
+                'subject' => '',
+                'body' => '',
+                'message' => '',
+                'ssid' => '',
+                'password' => '',
+                'encryption' => 'WPA',
+            ]);
+
+        $items = get_posts([
+            'post_type' => 'jaqr_code',
+            'post_status' => 'publish',
+            'numberposts' => 200,
+        ]);
+        ?>
+        <div class="wrap jaqr-admin-wrap">
+            <h1><?php esc_html_e('QR Manager', 'just-another-qr'); ?></h1>
+            <p><?php esc_html_e('Manage published QR codes without using the default WordPress post editor.', 'just-another-qr'); ?></p>
+            <div class="jaqr-builder-grid">
+                <div class="jaqr-card">
+                    <h2><?php echo esc_html($title); ?></h2>
+                    <form method="post" class="jaqr-live-form" data-live="manager">
+                        <?php wp_nonce_field('jaqr_manager_save', 'jaqr_manager_nonce'); ?>
+                        <input type="hidden" name="jaqr_manager_action" value="save" />
+                        <input type="hidden" name="jaqr_id" value="<?php echo esc_attr((string) $edit_id); ?>" />
+                        <p><label for="jaqr_manager_name"><strong><?php esc_html_e('QR Name', 'just-another-qr'); ?></strong></label><br><input class="widefat" id="jaqr_manager_name" name="name" type="text" value="<?php echo esc_attr($title); ?>" /></p>
+                        <p><label for="jaqr_manager_type"><strong><?php esc_html_e('Type', 'just-another-qr'); ?></strong></label><br><select id="jaqr_manager_type" name="type"><?php foreach (['url'=>'URL','text'=>'Text','phone'=>'Phone','email'=>'Email'] as $k=>$v): ?><option value="<?php echo esc_attr($k); ?>" <?php selected($meta['type'], $k); ?>><?php echo esc_html($v); ?></option><?php endforeach; ?></select></p>
+                        <p><label for="jaqr_manager_content"><strong><?php esc_html_e('Content', 'just-another-qr'); ?></strong></label><br><input class="widefat" id="jaqr_manager_content" name="content" type="text" value="<?php echo esc_attr($meta['content']); ?>" /></p>
+                        <p><label for="jaqr_manager_target_url"><strong><?php esc_html_e('Dynamic URL', 'just-another-qr'); ?></strong></label><br><input class="widefat" id="jaqr_manager_target_url" name="target_url" type="url" value="<?php echo esc_attr($meta['target_url']); ?>" /></p>
+                        <p><label><input type="checkbox" name="is_dynamic" value="1" <?php checked($meta['is_dynamic'], 1); ?> /> <?php esc_html_e('Enable Dynamic Tracking', 'just-another-qr'); ?></label></p>
+                        <p><label for="jaqr_manager_size"><strong><?php esc_html_e('Size', 'just-another-qr'); ?></strong></label><br><input id="jaqr_manager_size" name="size" type="number" min="100" max="1024" value="<?php echo esc_attr((string) $meta['size']); ?>" /></p>
+                        <p><label for="jaqr_manager_fg"><strong><?php esc_html_e('Foreground', 'just-another-qr'); ?></strong></label><br><input id="jaqr_manager_fg" name="fg" type="color" value="<?php echo esc_attr($meta['fg']); ?>" /></p>
+                        <p><label for="jaqr_manager_bg"><strong><?php esc_html_e('Background', 'just-another-qr'); ?></strong></label><br><input id="jaqr_manager_bg" name="bg" type="color" value="<?php echo esc_attr($meta['bg']); ?>" /></p>
+                        <p><label for="jaqr_manager_margin"><strong><?php esc_html_e('Margin', 'just-another-qr'); ?></strong></label><br><input id="jaqr_manager_margin" name="margin" type="number" min="0" max="20" value="<?php echo esc_attr((string) $meta['margin']); ?>" /></p>
+                        <p><label for="jaqr_manager_frame"><strong><?php esc_html_e('Frame', 'just-another-qr'); ?></strong></label><br><input class="widefat" id="jaqr_manager_frame" name="frame" type="text" value="<?php echo esc_attr($meta['frame']); ?>" /></p>
+                        <p><label><input type="checkbox" name="show_center_text" value="1" <?php checked($meta['show_center_text'], 1); ?> /> <?php esc_html_e('Show center text', 'just-another-qr'); ?></label></p>
+                        <p><label for="jaqr_manager_center_text"><strong><?php esc_html_e('Center Text', 'just-another-qr'); ?></strong></label><br><input class="widefat" id="jaqr_manager_center_text" name="center_text" type="text" value="<?php echo esc_attr($meta['center_text']); ?>" /></p>
+                        <p><button type="submit" class="button button-primary"><?php esc_html_e('Save QR', 'just-another-qr'); ?></button></p>
+                    </form>
+                </div>
+                <div class="jaqr-card">
+                    <h2><?php esc_html_e('Live Preview', 'just-another-qr'); ?></h2>
+                    <?php echo Renderer::render_qr([
+                        'content' => $preview_content,
+                        'size' => $meta['size'],
+                        'alt' => $meta['alt'],
+                        'frame' => $meta['frame'],
+                        'fg' => $meta['fg'],
+                        'bg' => $meta['bg'],
+                        'margin' => $meta['margin'],
+                        'show_center_text' => $meta['show_center_text'],
+                        'center_text' => $meta['center_text'],
+                        'show_downloads' => true,
+                    ]); ?>
+                    <h3><?php esc_html_e('Embed', 'just-another-qr'); ?></h3>
+                    <textarea id="jaqr_manager_shortcode" class="widefat jaqr-shortcode-output" rows="2" readonly><?php echo esc_textarea($shortcode); ?></textarea>
+                    <p><button type="button" class="button jaqr-copy-shortcode" data-copy-target="#jaqr_manager_shortcode"><?php esc_html_e('Copy', 'just-another-qr'); ?></button></p>
+                </div>
+            </div>
+            <div class="jaqr-card" style="margin-top:16px;">
+                <h2><?php esc_html_e('Published QR Codes', 'just-another-qr'); ?></h2>
+                <table class="widefat striped">
+                    <thead><tr><th><?php esc_html_e('Name', 'just-another-qr'); ?></th><th><?php esc_html_e('Shortcode', 'just-another-qr'); ?></th><th><?php esc_html_e('Scans', 'just-another-qr'); ?></th><th><?php esc_html_e('Action', 'just-another-qr'); ?></th></tr></thead>
+                    <tbody>
+                        <?php foreach ($items as $item): ?>
+                            <tr>
+                                <td><?php echo esc_html(get_the_title($item->ID)); ?></td>
+                                <td><code>[jaqr_code id="<?php echo esc_html((string) $item->ID); ?>"]</code></td>
+                                <td><?php echo esc_html((string) ((int) get_post_meta($item->ID, '_jaqr_total_scans', true))); ?></td>
+                                <td><a class="button button-small" href="<?php echo esc_url(admin_url('admin.php?page=jaqr-manager&edit=' . $item->ID)); ?>"><?php esc_html_e('Edit', 'just-another-qr'); ?></a></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php
+    }
+
     private static function default_settings(): array
     {
         return [
@@ -319,5 +417,69 @@ class Admin
         }
 
         return $series;
+    }
+
+    private static function handle_manager_save(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return;
+        }
+
+        if (empty($_POST['jaqr_manager_action']) || ! isset($_POST['jaqr_manager_nonce'])) {
+            return;
+        }
+
+        if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['jaqr_manager_nonce'])), 'jaqr_manager_save')) {
+            return;
+        }
+
+        $id = max(0, (int) ($_POST['jaqr_id'] ?? 0));
+        $post_data = [
+            'post_type' => 'jaqr_code',
+            'post_status' => 'publish',
+            'post_title' => sanitize_text_field((string) ($_POST['name'] ?? __('Untitled QR', 'just-another-qr'))),
+        ];
+        if ($id > 0) {
+            $post_data['ID'] = $id;
+            wp_update_post($post_data);
+        } else {
+            $id = (int) wp_insert_post($post_data);
+        }
+
+        if ($id <= 0) {
+            return;
+        }
+
+        update_post_meta($id, '_jaqr_type', sanitize_key((string) ($_POST['type'] ?? 'url')));
+        update_post_meta($id, '_jaqr_content', sanitize_text_field((string) ($_POST['content'] ?? '')));
+        update_post_meta($id, '_jaqr_target_url', esc_url_raw((string) ($_POST['target_url'] ?? '')));
+        update_post_meta($id, '_jaqr_is_dynamic', empty($_POST['is_dynamic']) ? 0 : 1);
+        update_post_meta($id, '_jaqr_size', max(100, min(1024, (int) ($_POST['size'] ?? 220))));
+        update_post_meta($id, '_jaqr_fg', sanitize_hex_color((string) ($_POST['fg'] ?? '#000000')) ?: '#000000');
+        update_post_meta($id, '_jaqr_bg', sanitize_hex_color((string) ($_POST['bg'] ?? '#ffffff')) ?: '#ffffff');
+        update_post_meta($id, '_jaqr_margin', max(0, min(20, (int) ($_POST['margin'] ?? 1))));
+        update_post_meta($id, '_jaqr_frame', sanitize_text_field((string) ($_POST['frame'] ?? '')));
+        update_post_meta($id, '_jaqr_show_center_text', empty($_POST['show_center_text']) ? 0 : 1);
+        update_post_meta($id, '_jaqr_center_text', sanitize_text_field((string) ($_POST['center_text'] ?? '')));
+    }
+
+    private static function manager_default_meta(): array
+    {
+        $settings = wp_parse_args((array) get_option('jaqr_settings', []), self::default_settings());
+
+        return [
+            'type' => 'url',
+            'content' => home_url('/'),
+            'target_url' => '',
+            'is_dynamic' => 0,
+            'size' => (int) $settings['default_size'],
+            'alt' => __('QR code', 'just-another-qr'),
+            'frame' => '',
+            'fg' => '#000000',
+            'bg' => '#ffffff',
+            'margin' => 1,
+            'show_center_text' => (int) $settings['show_brand_center'],
+            'center_text' => (string) $settings['brand_name'],
+        ];
     }
 }

@@ -40,9 +40,7 @@ class Renderer
         ob_start();
         ?>
         <figure class="<?php echo esc_attr($wrapper_class); ?>">
-            <?php if ($label !== ''): ?>
-                <figcaption class="jaqr-frame"><?php echo esc_html($label); ?></figcaption>
-            <?php endif; ?>
+            <figcaption class="jaqr-frame" style="<?php echo $label === '' ? 'display:none;' : ''; ?>"><?php echo esc_html($label); ?></figcaption>
             <div class="jaqr-canvas">
                 <img
                     class="jaqr-image"
@@ -53,9 +51,7 @@ class Renderer
                     loading="lazy"
                     decoding="async"
                 />
-                <?php if ($show_center_text) : ?>
-                    <span class="jaqr-center-badge"><?php echo esc_html($center_text); ?></span>
-                <?php endif; ?>
+                <span class="jaqr-center-badge" style="<?php echo $show_center_text ? '' : 'display:none;'; ?>"><?php echo esc_html($center_text); ?></span>
             </div>
             <?php if (! empty($args['show_downloads'])) : ?>
                 <div class="jaqr-actions">

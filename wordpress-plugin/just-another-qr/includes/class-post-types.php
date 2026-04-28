@@ -19,7 +19,7 @@ class Post_Types
         register_post_type('jaqr_code', [
             'label' => __('QR Codes', 'just-another-qr'),
             'public' => false,
-            'show_ui' => true,
+            'show_ui' => false,
             'show_in_menu' => false,
             'supports' => ['title', 'custom-fields'],
             'capability_type' => 'post',

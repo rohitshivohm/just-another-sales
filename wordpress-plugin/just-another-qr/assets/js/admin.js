@@ -79,6 +79,24 @@
     };
   }
 
+  function readManagerState(form) {
+    var type = qs('[name="type"]', form)?.value || 'url';
+    var content = qs('[name="content"]', form)?.value || '';
+    return {
+      type: type,
+      content: content,
+      payload: buildPayload(type, content),
+      size: parseInt(qs('[name="size"]', form)?.value || '220', 10),
+      frame: qs('[name="frame"]', form)?.value || '',
+      alt: 'QR code',
+      centerText: qs('[name="center_text"]', form)?.value || '',
+      showCenter: !!qs('[name="show_center_text"]:checked', form),
+      fg: qs('[name="fg"]', form)?.value || '#000000',
+      bg: qs('[name="bg"]', form)?.value || '#ffffff',
+      margin: parseInt(qs('[name="margin"]', form)?.value || '1', 10),
+    };
+  }
+
   function updatePreview(root, state, isBuilder) {
     var img = qs('.jaqr-canvas .jaqr-image', root);
     if (img) img.src = buildQrUrl(state);
@@ -141,6 +159,23 @@
     });
   }
 
+  function bindLiveManager() {
+    var form = qs('.jaqr-live-form[data-live="manager"]');
+    if (!form) return;
+
+    var root = form.closest('.jaqr-builder-grid');
+    var handler = function () {
+      updatePreview(root, readManagerState(form), false);
+      var output = byId('jaqr_manager_shortcode');
+      if (output) output.value = buildShortcode(readManagerState(form));
+    };
+
+    qsa('input, select, textarea', form).forEach(function (el) {
+      el.addEventListener('input', handler);
+      el.addEventListener('change', handler);
+    });
+  }
+
   function bindCopyButtons() {
     qsa('.jaqr-copy-shortcode').forEach(function (button) {
       button.addEventListener('click', function () {
@@ -169,6 +204,7 @@
     bindCopyButtons();
     bindLiveBuilder();
     bindLivePostEditor();
+    bindLiveManager();
   }
 
   if (document.readyState === 'loading') {
