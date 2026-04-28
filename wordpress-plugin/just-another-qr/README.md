@@ -16,6 +16,7 @@ This plugin scaffold is structured to support the full feature set requested for
 - Dynamic QR redirect endpoint (`/wp-json/jaqr/v1/track/{id}`) with total + daily scan counts.
 - Admin dashboard + settings pages.
 - New QR Builder admin page (`Just Another QR → QR Builder`) for postless, instant QR generation + shortcode copy.
+- Brand text in QR center (configurable globally and per QR code).
 - Frontend styling (frame label + shadow effect).
 
 ## Settings behavior (now connected)
@@ -25,6 +26,8 @@ This plugin scaffold is structured to support the full feature set requested for
   - OFF: tracked redirects are blocked, and QR output uses static payload.
 - `Default QR Size`:
   - Applies to shortcode/block/render defaults and new QR code records.
+- `Brand Name` + `Show Brand in QR Center by Default`:
+  - Used by builder and QR post editor to render center badge text when enabled.
 
 ## Next implementation phases for full parity
 

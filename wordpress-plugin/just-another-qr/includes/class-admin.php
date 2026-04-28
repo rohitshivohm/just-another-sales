@@ -44,6 +44,8 @@ class Admin
             'enable_dynamic' => empty($input['enable_dynamic']) ? 0 : 1,
             'utm_enabled' => empty($input['utm_enabled']) ? 0 : 1,
             'default_size' => max(100, min(1024, (int) ($input['default_size'] ?? 220))),
+            'brand_name' => sanitize_text_field((string) ($input['brand_name'] ?? '')),
+            'show_brand_center' => empty($input['show_brand_center']) ? 0 : 1,
         ];
     }
 
@@ -121,6 +123,14 @@ class Admin
                         <th scope="row"><?php esc_html_e('Default QR Size', 'just-another-qr'); ?></th>
                         <td><input type="number" min="100" max="1024" name="jaqr_settings[default_size]" value="<?php echo esc_attr((string) ($settings['default_size'] ?? 220)); ?>" /></td>
                     </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Brand Name', 'just-another-qr'); ?></th>
+                        <td><input type="text" class="regular-text" name="jaqr_settings[brand_name]" value="<?php echo esc_attr((string) ($settings['brand_name'] ?? '')); ?>" /></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Show Brand in QR Center by Default', 'just-another-qr'); ?></th>
+                        <td><input type="checkbox" name="jaqr_settings[show_brand_center]" value="1" <?php checked(! empty($settings['show_brand_center'])); ?> /></td>
+                    </tr>
                 </table>
                 <?php submit_button(); ?>
             </form>
@@ -136,14 +146,20 @@ class Admin
         $size = max(100, min(1024, (int) ($_GET['size'] ?? $settings['default_size'])));
         $frame = sanitize_text_field((string) ($_GET['frame'] ?? ''));
         $alt = sanitize_text_field((string) ($_GET['alt'] ?? __('QR code', 'just-another-qr')));
+        $center_text = sanitize_text_field((string) ($_GET['center_text'] ?? ($settings['brand_name'] ?? '')));
+        $show_center_text = isset($_GET['show_center_text'])
+            ? (int) (((string) $_GET['show_center_text']) === '1')
+            : (int) ($settings['show_brand_center'] ?? 0);
 
         $shortcode = sprintf(
-            '[jaqr type="%s" content="%s" size="%d" frame="%s" alt="%s"]',
+            '[jaqr type="%s" content="%s" size="%d" frame="%s" alt="%s" show_center_text="%d" center_text="%s"]',
             esc_attr($type),
             esc_attr($content),
             $size,
             esc_attr($frame),
-            esc_attr($alt)
+            esc_attr($alt),
+            $show_center_text,
+            esc_attr($center_text)
         );
         ?>
         <div class="wrap jaqr-admin-wrap">
@@ -154,6 +170,7 @@ class Admin
                 <div class="jaqr-card">
                     <form method="get" action="">
                         <input type="hidden" name="page" value="jaqr-builder" />
+                        <input type="hidden" name="show_center_text" value="0" />
                         <p>
                             <label for="jaqr_builder_type"><strong><?php esc_html_e('Type', 'just-another-qr'); ?></strong></label><br>
                             <select id="jaqr_builder_type" name="type">
@@ -178,6 +195,13 @@ class Admin
                         <p>
                             <label for="jaqr_builder_alt"><strong><?php esc_html_e('Alt Text', 'just-another-qr'); ?></strong></label><br>
                             <input class="widefat" id="jaqr_builder_alt" name="alt" type="text" value="<?php echo esc_attr($alt); ?>" />
+                        </p>
+                        <p>
+                            <label><input type="checkbox" name="show_center_text" value="1" <?php checked($show_center_text, 1); ?> /> <?php esc_html_e('Show brand text in center', 'just-another-qr'); ?></label>
+                        </p>
+                        <p>
+                            <label for="jaqr_builder_center_text"><strong><?php esc_html_e('Center Brand Text', 'just-another-qr'); ?></strong></label><br>
+                            <input class="widefat" id="jaqr_builder_center_text" name="center_text" type="text" value="<?php echo esc_attr($center_text); ?>" />
                         </p>
                         <p>
                             <button class="button button-primary" type="submit"><?php esc_html_e('Generate Preview', 'just-another-qr'); ?></button>
@@ -208,6 +232,8 @@ class Admin
             'enable_dynamic' => 1,
             'utm_enabled' => 1,
             'default_size' => 220,
+            'brand_name' => '',
+            'show_brand_center' => 0,
         ];
     }
 }

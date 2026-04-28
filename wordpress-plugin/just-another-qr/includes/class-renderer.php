@@ -22,6 +22,8 @@ class Renderer
             'alt' => __('QR code', 'just-another-qr'),
             'frame' => '',
             'class' => '',
+            'show_center_text' => false,
+            'center_text' => '',
         ];
 
         $args = wp_parse_args($atts, $defaults);
@@ -29,6 +31,8 @@ class Renderer
 
         $label = trim((string) $args['frame']);
         $wrapper_class = 'jaqr-wrap ' . sanitize_html_class((string) $args['class']);
+        $center_text = trim((string) $args['center_text']);
+        $show_center_text = ! empty($args['show_center_text']) && $center_text !== '';
 
         ob_start();
         ?>
@@ -36,14 +40,19 @@ class Renderer
             <?php if ($label !== ''): ?>
                 <figcaption class="jaqr-frame"><?php echo esc_html($label); ?></figcaption>
             <?php endif; ?>
-            <img
-                src="<?php echo esc_url($img); ?>"
-                alt="<?php echo esc_attr((string) $args['alt']); ?>"
-                width="<?php echo esc_attr((int) $args['size']); ?>"
-                height="<?php echo esc_attr((int) $args['size']); ?>"
-                loading="lazy"
-                decoding="async"
-            />
+            <div class="jaqr-canvas">
+                <img
+                    src="<?php echo esc_url($img); ?>"
+                    alt="<?php echo esc_attr((string) $args['alt']); ?>"
+                    width="<?php echo esc_attr((int) $args['size']); ?>"
+                    height="<?php echo esc_attr((int) $args['size']); ?>"
+                    loading="lazy"
+                    decoding="async"
+                />
+                <?php if ($show_center_text) : ?>
+                    <span class="jaqr-center-badge"><?php echo esc_html($center_text); ?></span>
+                <?php endif; ?>
+            </div>
         </figure>
         <?php
 

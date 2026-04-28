@@ -35,6 +35,8 @@ class Shortcode
             'ssid' => '',
             'password' => '',
             'encryption' => 'WPA',
+            'show_center_text' => 0,
+            'center_text' => '',
         ], $atts, 'jaqr');
 
         $atts['content'] = self::build_payload($atts);
